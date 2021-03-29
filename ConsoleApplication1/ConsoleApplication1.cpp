@@ -1,11 +1,21 @@
 // ConsoleApplication1.cpp : This file contains the 'main' function. Program execution begins and ends there.
 //
-
+#pragma comment(lib, "winmm.lib")
 #include <iostream>
+#include <windows.h>
+#include <mmsystem.h>
+
+
 
 int main()
 {
-    std::cout << "Hello World!\n";asd
+    std::cout << "Hello World!\n";
+
+    LPCWSTR Pathname = L"riff.wav";
+
+    PlaySound(Pathname, NULL, SND_FILENAME);
+    return 0;
+    
 }
 
 // Run program: Ctrl + F5 or Debug > Start Without Debugging menu
