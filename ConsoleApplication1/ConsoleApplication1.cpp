@@ -4,16 +4,49 @@
 #include <iostream>
 #include <windows.h>
 #include <mmsystem.h>
+#include <fstream>
+#include <string>
+#include <sstream>
+#include <thread>
 
+void PlayMusic(LPCWSTR pathname) {
+
+    PlaySound(pathname, NULL, SND_FILENAME);
+}
+
+void ProcessSound(LPCWSTR pathname) {
+    std::ifstream Sonido(pathname, std::ifstream::binary);
+    std::string outtext;
+
+    while (std::getline(Sonido, outtext)) {
+       
+        std::cout << outtext;
+    }
+
+
+}
 
 
 int main()
 {
     std::cout << "Hello World!\n";
 
-    LPCWSTR Pathname = L"riff.wav";
 
-    PlaySound(Pathname, NULL, SND_FILENAME);
+
+    LPCWSTR Pathname = L"UGO.wav";
+    
+
+    std::thread Process(ProcessSound, Pathname);
+
+    std::thread Playback(PlayMusic, Pathname);
+
+    
+
+
+    Playback.join();
+    Process.join();
+    
+    
     return 0;
     
 }
