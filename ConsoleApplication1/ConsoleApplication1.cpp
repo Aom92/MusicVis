@@ -16,16 +16,16 @@ struct wav_header {
     char* Format = (char*)calloc(4, 4);
 
     char* Subchunk1ID = (char*)calloc(4, 4);
-    char* SubChunk1Size = (char*)calloc(4, 4);
-    char* AudioFormat = (char*)calloc(2, 2);
-    char* NumChannels = (char*)calloc(2, 2);
-    long SampleRate;
+    unsigned long int SubChunk1Size;
+    unsigned short int AudioFormat;
+    unsigned short int NumChannels;
+    unsigned long SampleRate;
     unsigned long ByteRate;
     unsigned short int BlockAlign;
     unsigned short int BitsPerSample;
     
-    char Subchunk2ID[4];
-    unsigned long Subchunk2Size;
+    char* Subchunk2ID = (char*)calloc(4, 4);
+    unsigned long int Subchunk2Size;
 
 
 public:
@@ -38,29 +38,61 @@ public:
         fread(&ChunkSize,4,1,audioin);
         fread(Format, 4, 1,audioin);
         fread(Subchunk1ID, 4, 1, audioin);
-        fread(SubChunk1Size, 4, 1, audioin);
-        fread(AudioFormat, 2, 1, audioin);
-        fread(NumChannels, 2, 1, audioin);
+        fread(&SubChunk1Size, 4, 1, audioin);
+        fread(&AudioFormat, 2, 1, audioin);
+        fread(&NumChannels, 2, 1, audioin);
         fread(&SampleRate, 4, 1, audioin);
         fread(&ByteRate, 4, 1, audioin);
         fread(&BlockAlign, 2, 1, audioin);
         fread(&BitsPerSample, 2, 1, audioin);
+        fread(Subchunk2ID, 4, 1, audioin);
+        fread(&Subchunk2Size, 4, 1, audioin);
+
+        //short int* data = (short int*) calloc(1, Subchunk2Size);
+        //fread(data, Subchunk2Size, 1, audioin);
+
+
+        int sample_size = BitsPerSample / 8; //Esto esta en Bytes.
+        int sample_count = (Subchunk2Size) / BitsPerSample;
+        std::cout << "Sample count: " << sample_count << '\n';
+
+        short int* audio_dat = (short int*)calloc(sample_count, 2);
+        for (size_t i = 0; i < sample_count; i++)
+        {
+
+            fread(&audio_dat[i], 2, 1, audioin);
+            std::cout << "Sample " << i << " Data: " << audio_dat[i] << '\n';
+
+
+        }
+
+
+
+
+
+
+
+        fclose(audioin);
+
+        
 
     }
 
-    void print() {
+    void print_header() {
 
         std::cout << "ChunkID: " << ChunkID << std::endl;
         std::cout << "ChunkSize: " << ChunkSize << std::endl;
         std::cout << "Format: " << Format  << std::endl;
         std::cout << "Subchink1ID: " << Subchunk1ID << std::endl;
-        std::cout << "SubChunk1Size: "<< (int)SubChunk1Size[0] << std::endl;
-        std::cout << "AudioFormat: " << (int)AudioFormat[0] << std::endl;
-        std::cout << "NumChannels: " << (int)NumChannels[0] << std::endl;
-        std::cout << "SampleRate: " << (UINT16)SampleRate << std::endl;
+        std::cout << "SubChunk1Size: "<< SubChunk1Size << std::endl;
+        std::cout << "AudioFormat: " << AudioFormat << std::endl;
+        std::cout << "NumChannels: " << NumChannels << std::endl;
+        std::cout << "SampleRate: " << SampleRate << std::endl;
         std::cout << "ByteRate: " << ByteRate << std::endl;
         std::cout << "BlockAllign: " << BlockAlign << std::endl;
         std::cout << "BitsPerSample: " << BitsPerSample << std::endl;
+        std::cout << "Subchunk2ID: " << Subchunk2ID << std::endl;
+        std::cout << "Subchunk2Size: " << Subchunk2Size << std::endl;
 
     }
 
@@ -83,8 +115,15 @@ void PlayMusic(LPCWSTR pathname) {
 void ProcessSound(std::string pathname) {
     wav_header header;
     
-    header.readWAV( pathname );
-    header.print();
+    
+    header.readWAV(pathname);
+    header.print_header();
+
+
+    
+
+
+    
 
 
 #if 0
@@ -103,10 +142,10 @@ int main()
 
     
 
-    LPCWSTR Pathname = L"UGO.wav";
+    LPCWSTR Pathname = L"riff.wav";
     
 
-    std::thread Process(ProcessSound, "UGO.wav");
+    std::thread Process(ProcessSound, "riff.wav");
 
     std::thread Playback(PlayMusic, Pathname);
 
