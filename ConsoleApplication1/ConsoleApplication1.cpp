@@ -118,25 +118,14 @@ void PlayMusic(LPCWSTR pathname) {
 }
 
 void ProcessSound(std::string pathname) {
-    wav_header header;
     
+    wav_header header;
     
     header.readWAV(pathname);
     header.print_header();
 
 
-    
-
-
-    
-
-
-#if 0
-    while (std::getline(Sonido, outtext)) {
-       
-        std::cout << outtext;
-    }
-#endif
+ 
 
 }
 
