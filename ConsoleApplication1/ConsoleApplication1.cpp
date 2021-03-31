@@ -24,7 +24,7 @@ struct wav_header {
     unsigned short int BlockAlign;
     unsigned short int BitsPerSample;
     
-    char Subchunk2ID[4];
+    char* Subchunk2ID = (char*)calloc(4, 4);
     unsigned long int Subchunk2Size;
 
 
@@ -48,17 +48,37 @@ public:
         fread(Subchunk2ID, 4, 1, audioin);
         fread(&Subchunk2Size, 4, 1, audioin);
 
-        unsigned short int* data;
-        fread(data, Subchunk2Size, 1, audioin);
+        //short int* data = (short int*) calloc(1, Subchunk2Size);
+        //fread(data, Subchunk2Size, 1, audioin);
+
+
+        int sample_size = BitsPerSample / 8; //Esto esta en Bytes.
+        int sample_count = (Subchunk2Size) / BitsPerSample;
+        std::cout << "Sample count: " << sample_count << '\n';
+
+        short int* audio_dat = (short int*)calloc(sample_count, 2);
+        for (size_t i = 0; i < sample_count; i++)
+        {
+
+            fread(&audio_dat[i], 2, 1, audioin);
+            std::cout << "Sample " << i << " Data: " << audio_dat[i] << '\n';
+
+
+        }
+
+
 
 
 
 
 
         fclose(audioin);
+
+        
+
     }
 
-    void print() {
+    void print_header() {
 
         std::cout << "ChunkID: " << ChunkID << std::endl;
         std::cout << "ChunkSize: " << ChunkSize << std::endl;
@@ -95,8 +115,15 @@ void PlayMusic(LPCWSTR pathname) {
 void ProcessSound(std::string pathname) {
     wav_header header;
     
-    header.readWAV( pathname );
-    header.print();
+    
+    header.readWAV(pathname);
+    header.print_header();
+
+
+    
+
+
+    
 
 
 #if 0
@@ -115,10 +142,10 @@ int main()
 
     
 
-    LPCWSTR Pathname = L"UGO.wav";
+    LPCWSTR Pathname = L"riff.wav";
     
 
-    std::thread Process(ProcessSound, "UGO.wav");
+    std::thread Process(ProcessSound, "riff.wav");
 
     std::thread Playback(PlayMusic, Pathname);
 
