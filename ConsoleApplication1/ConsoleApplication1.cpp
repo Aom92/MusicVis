@@ -16,16 +16,16 @@ struct wav_header {
     char* Format = (char*)calloc(4, 4);
 
     char* Subchunk1ID = (char*)calloc(4, 4);
-    char* SubChunk1Size = (char*)calloc(4, 4);
-    char* AudioFormat = (char*)calloc(2, 2);
-    char* NumChannels = (char*)calloc(2, 2);
-    long SampleRate;
+    unsigned long int SubChunk1Size;
+    unsigned short int AudioFormat;
+    unsigned short int NumChannels;
+    unsigned long SampleRate;
     unsigned long ByteRate;
     unsigned short int BlockAlign;
     unsigned short int BitsPerSample;
     
     char Subchunk2ID[4];
-    unsigned long Subchunk2Size;
+    unsigned long int Subchunk2Size;
 
 
 public:
@@ -38,14 +38,24 @@ public:
         fread(&ChunkSize,4,1,audioin);
         fread(Format, 4, 1,audioin);
         fread(Subchunk1ID, 4, 1, audioin);
-        fread(SubChunk1Size, 4, 1, audioin);
-        fread(AudioFormat, 2, 1, audioin);
-        fread(NumChannels, 2, 1, audioin);
+        fread(&SubChunk1Size, 4, 1, audioin);
+        fread(&AudioFormat, 2, 1, audioin);
+        fread(&NumChannels, 2, 1, audioin);
         fread(&SampleRate, 4, 1, audioin);
         fread(&ByteRate, 4, 1, audioin);
         fread(&BlockAlign, 2, 1, audioin);
         fread(&BitsPerSample, 2, 1, audioin);
+        fread(Subchunk2ID, 4, 1, audioin);
+        fread(&Subchunk2Size, 4, 1, audioin);
 
+        unsigned short int* data;
+        fread(data, Subchunk2Size, 1, audioin);
+
+
+
+
+
+        fclose(audioin);
     }
 
     void print() {
@@ -54,13 +64,15 @@ public:
         std::cout << "ChunkSize: " << ChunkSize << std::endl;
         std::cout << "Format: " << Format  << std::endl;
         std::cout << "Subchink1ID: " << Subchunk1ID << std::endl;
-        std::cout << "SubChunk1Size: "<< (int)SubChunk1Size[0] << std::endl;
-        std::cout << "AudioFormat: " << (int)AudioFormat[0] << std::endl;
-        std::cout << "NumChannels: " << (int)NumChannels[0] << std::endl;
-        std::cout << "SampleRate: " << (UINT16)SampleRate << std::endl;
+        std::cout << "SubChunk1Size: "<< SubChunk1Size << std::endl;
+        std::cout << "AudioFormat: " << AudioFormat << std::endl;
+        std::cout << "NumChannels: " << NumChannels << std::endl;
+        std::cout << "SampleRate: " << SampleRate << std::endl;
         std::cout << "ByteRate: " << ByteRate << std::endl;
         std::cout << "BlockAllign: " << BlockAlign << std::endl;
         std::cout << "BitsPerSample: " << BitsPerSample << std::endl;
+        std::cout << "Subchunk2ID: " << Subchunk2ID << std::endl;
+        std::cout << "Subchunk2Size: " << Subchunk2Size << std::endl;
 
     }
 
