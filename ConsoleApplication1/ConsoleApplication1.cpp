@@ -11,6 +11,11 @@
 
 struct wav_header {
 
+    /*
+        Basandonos en la estructura  canonica del formato WAVE:
+        http://soundfile.sapp.org/doc/WaveFormat/
+
+    */
     char* ChunkID = (char*)calloc(4, 4);
     unsigned int ChunkSize;
     char* Format = (char*)calloc(4, 4);
