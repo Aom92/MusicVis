@@ -29,10 +29,10 @@ struct wav_header {
 
 
 public:
-    void readWAV( std::ifstream &audioFile  )  { 
+    void readWAV( std::string pathaudioFile  )  { 
   
         FILE* audioin; 
-        fopen_s(&audioin, "UGO.wav", "rb");
+        fopen_s(&audioin, pathaudioFile.c_str(), "rb");
         
         fread(ChunkID, 4, 1, audioin);
         fread(&ChunkSize,4,1,audioin);
@@ -46,28 +46,6 @@ public:
         fread(&BlockAlign, 2, 1, audioin);
         fread(&BitsPerSample, 2, 1, audioin);
 
-
-#if 0
-        audioFile.read(ChunkID, 4 );
-
-        audioFile.read(Buffer , 4);  ChunkSize = (unsigned long)Buffer;
-        audioFile.read(Format, 4);
-        audioFile.read(Subchunk1ID, 4); 
-        audioFile.read(SubChunk1Size, 4); 
-        realloc(Buffer, 2);
-        audioFile.read(AudioFormat, 2); 
-        audioFile.read(NumChannels, 2); 
-     
-        realloc(Buffer, 4);
-        //audioFile.read(SampleRate, 4); 
-        audioFile.read(Buffer, 4); ByteRate = (unsigned long)Buffer;
-       
-        realloc(Buffer, 2);
-        audioFile.read(Buffer, 2); BlockAlign = (unsigned long)Buffer;
-        audioFile.read(Buffer, 2); BitsPerSample = (unsigned long)Buffer;
-
-        free(Buffer);
-#endif
     }
 
     void print() {
@@ -97,17 +75,15 @@ public:
 
 void PlayMusic(LPCWSTR pathname) {
 
+    std::cout << "Playing music! " << std::endl;
+
     PlaySound(pathname, NULL, SND_FILENAME);
 }
 
-void ProcessSound(LPCWSTR pathname) {
+void ProcessSound(std::string pathname) {
     wav_header header;
-
-    std::ifstream Sonido(pathname, std::ifstream::binary);
-    std::string outtext;
-
-
-    header.readWAV( Sonido );
+    
+    header.readWAV( pathname );
     header.print();
 
 
@@ -130,24 +106,14 @@ int main()
     LPCWSTR Pathname = L"UGO.wav";
     
 
-    //std::thread Process(ProcessSound, Pathname);
+    std::thread Process(ProcessSound, "UGO.wav");
 
-    //std::thread Playback(PlayMusic, Pathname);
-
-
-    //Playback.join();
-    //Process.join();
-    
-
-    wav_header header;
-
-    std::ifstream Sonido(Pathname, std::ifstream::binary);
-    std::string outtext;
+    std::thread Playback(PlayMusic, Pathname);
 
 
-    header.readWAV(Sonido);
-    header.print();
-
+    Playback.join();
+    Process.join();
+   
     
     return 0;
     
