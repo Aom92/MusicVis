@@ -8,9 +8,17 @@
 #include <string>
 #include <sstream>
 #include <thread>
+#include <fftw3.h>
+
+
 
 struct wav_header {
 
+    /*
+        Basandonos en la estructura  canonica del formato WAVE:
+        http://soundfile.sapp.org/doc/WaveFormat/
+
+    */
     char* ChunkID = (char*)calloc(4, 4);
     unsigned int ChunkSize;
     char* Format = (char*)calloc(4, 4);
@@ -113,27 +121,25 @@ void PlayMusic(LPCWSTR pathname) {
 }
 
 void ProcessSound(std::string pathname) {
-    wav_header header;
     
+    wav_header header;
     
     header.readWAV(pathname);
     header.print_header();
 
 
-    
-
-
-    
-
-
-#if 0
-    while (std::getline(Sonido, outtext)) {
-       
-        std::cout << outtext;
-    }
-#endif
+ 
 
 }
+
+void FFT() {
+    fftw_complex* out;
+    fftw_plan p;
+
+
+}
+
+
 
 
 int main()
