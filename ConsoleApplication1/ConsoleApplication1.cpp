@@ -8,6 +8,9 @@
 #include <string>
 #include <sstream>
 #include <thread>
+#include <fftw3.h>
+
+
 
 struct wav_header {
 
@@ -128,6 +131,15 @@ void ProcessSound(std::string pathname) {
  
 
 }
+
+void FFT() {
+    fftw_complex* out;
+    fftw_plan p;
+
+
+}
+
+
 
 
 int main()
