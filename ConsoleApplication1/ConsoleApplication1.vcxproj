@@ -92,13 +92,14 @@
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
-      <AdditionalIncludeDirectories>C:\Users\Aom92\source\repos\musicvis\MusicVis\lib\FFTW;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\Aom92\source\repos\musicvis\MusicVis\include\GL;C:\Users\Aom92\source\repos\musicvis\MusicVis\include\GLFW;C:\Users\Aom92\source\repos\musicvis\MusicVis\include\FFTW;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <ShowProgress>LinkVerbose</ShowProgress>
-      <AdditionalLibraryDirectories>C:\Users\Aom92\source\repos\musicvis\MusicVis\lib\FFTW;/LIBPATH</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>C:\Users\Aom92\source\repos\musicvis\MusicVis\lib\lib-vc2019;C:\Users\Aom92\source\repos\musicvis\MusicVis\lib\glew\Win32;/LIBPATH</AdditionalLibraryDirectories>
+      <AdditionalDependencies>glfw3.lib;glfw3dll.lib;glew32.dll;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -109,12 +110,15 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>C:\Users\Aom92\source\repos\musicvis\MusicVis\lib\GLFW\include;C:\Users\Aom92\source\repos\musicvis\MusicVis\lib\FFTW;</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>glfw3dll.lib;glfw3.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>C:\Users\Aom92\source\repos\musicvis\MusicVis\lib\GLFW\lib-vc2019;C:\Users\Aom92\source\repos\musicvis\MusicVis\lib\FFTW;;/LIBPATH</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -123,10 +127,13 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>C:\Users\Aom92\source\repos\musicvis\MusicVis\src;C:\Users\Aom92\source\repos\musicvis\MusicVis\include\KHR;C:\Users\Aom92\source\repos\musicvis\MusicVis\include\GL;C:\Users\Aom92\source\repos\musicvis\MusicVis\include\GLFW;C:\Users\Aom92\source\repos\musicvis\MusicVis\include\FFTW;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>C:\Users\Aom92\source\repos\musicvis\MusicVis\lib\glew\x64;C:\Users\Aom92\source\repos\musicvis\MusicVis\lib\lib-vc2019;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>opengl32.lib;glfw3dll.lib;glew32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">

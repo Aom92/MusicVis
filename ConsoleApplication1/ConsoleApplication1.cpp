@@ -1,6 +1,9 @@
 // ConsoleApplication1.cpp : This file contains the 'main' function. Program execution begins and ends there.
 //
 #pragma comment(lib, "winmm.lib")
+
+
+
 #include <iostream>
 #include <windows.h>
 #include <mmsystem.h>
@@ -9,6 +12,15 @@
 #include <sstream>
 #include <thread>
 #include <fftw3.h>
+
+#define GLFW_INCLUDE_NONE
+#include <glfw3.h>
+#include <glew.h>
+
+
+
+
+
 
 
 
@@ -69,7 +81,7 @@ public:
         {
 
             fread(&audio_dat[i], 2, 1, audioin);
-            std::cout << "Sample " << i << " Data: " << audio_dat[i] << '\n';
+            //std::cout << "Sample " << i << " Data: " << audio_dat[i] << '\n';
 
 
         }
@@ -139,6 +151,43 @@ void FFT() {
 
 }
 
+int Draw() {
+    GLFWwindow* window;
+
+    /* Inicializamos la biblioteca */
+    if (!glfwInit())
+        return -1;
+
+    /* Crear ventana y su contexto OpenGL*/
+    window = glfwCreateWindow(640, 480, "MusicVis", NULL, NULL);
+
+    if (!window) {
+        glfwTerminate();
+        return -1;
+    }
+
+    /* Hacemos el contexto de la ventana actual */
+    glfwMakeContextCurrent(window);
+
+    /* Entramos en un blucle hastar cerrar la ventana */
+    while (!glfwWindowShouldClose(window)) {
+
+        /* Renderizamos */
+        glClear(GL_COLOR_BUFFER_BIT);
+
+
+        /* Swap front and back buffers */
+        glfwSwapBuffers(window);
+
+        /* Poll for and process events */
+        glfwPollEvents();
+    }
+
+
+    glfwTerminate();
+}
+
+
 
 
 
@@ -148,19 +197,24 @@ int main()
 
     
 
-    LPCWSTR Pathname = L"riff.wav";
-    
 
-    std::thread Process(ProcessSound, "riff.wav");
+    LPCWSTR Pathname = L"UGO.wav";
+
+
+    std::thread Process(ProcessSound, "UGO.wav");
 
     std::thread Playback(PlayMusic, Pathname);
 
+    std::thread Render(Draw);
 
-    Playback.join();
     Process.join();
-   
-    
+    Playback.join();
+    Render.join();
+
+
     return 0;
+
+    
     
 }
 
