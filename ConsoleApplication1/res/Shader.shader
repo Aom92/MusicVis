@@ -2,9 +2,16 @@
 #version 330 core
 
 layout(location = 0) in vec4 position;
+uniform float iTime;
 void main()
-{
-	gl_Position = position;
+{	
+	vec2 iResolution;
+	iResolution = vec2(640.0, 480.0);
+	vec2 uv = position.xy / iResolution.xy * 0.05;
+
+
+	
+	gl_Position = vec4(uv.x * cos(iTime + 0.5 ) - uv.y * sin(iTime+0.5), uv.x * sin(iTime+0.3) + uv.y * cos( iTime +0.3) ,   0.5 , 0.5 );
 };
 
 

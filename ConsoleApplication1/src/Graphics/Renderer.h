@@ -19,4 +19,5 @@ class Renderer
 {
 public:
     void Draw(const VertexArray& va, const IndexBuffer& ib, const Shader& shader) const;
+    void DrawPoints(const VertexArray& va,const Shader& shader, unsigned int first) const;
 };

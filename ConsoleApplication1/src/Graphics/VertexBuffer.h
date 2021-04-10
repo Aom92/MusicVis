@@ -13,5 +13,6 @@ public:
 
 	void Bind() const ;
 	void UnBind() const ;
+	void Update(const void* data, unsigned int size);
 
 };

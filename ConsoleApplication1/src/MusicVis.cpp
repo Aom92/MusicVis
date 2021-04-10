@@ -45,10 +45,12 @@ struct wav_header {
 
     char* Subchunk2ID = (char*)calloc(4, 4);
     unsigned long int Subchunk2Size = 0;
+    short int* audiodata;
 
+    unsigned int SampleCount;
 
 public:
-    short int* readWAV(std::string pathaudioFile) {
+    void readWAV(std::string pathaudioFile) {
 
         FILE* audioin;
         fopen_s(&audioin, pathaudioFile.c_str(), "rb");
@@ -72,15 +74,17 @@ public:
 
 
         int sample_size = BitsPerSample / 8; //Esto esta en Bytes.
-        int sample_count = (Subchunk2Size) / BitsPerSample;
+        int sample_count = (Subchunk2Size) / sample_size;
         std::cout << "Sample count: " << sample_count << '\n';
+        SampleCount = sample_count;
 
-        short int* audio_dat = (short int*)calloc(sample_count, 2);
+        audiodata = (short int*)calloc(sample_count, 2);
+        
         for (int i = 0; i < sample_count; i++)
         {
 
-            fread(&audio_dat[i], 2, 1, audioin);
-            //std::cout << "Sample " << i << " Data: " << audio_dat[i] << '\n';
+            fread(&audiodata[i], 2, 1, audioin);
+            //std::cout << "Sample " << i << " Data: " << audiodata[i] << '\n';
 
 
         }
@@ -88,7 +92,7 @@ public:
 
         fclose(audioin);
 
-        return audio_dat;
+        
 
     }
 
@@ -122,16 +126,12 @@ void PlayMusic(LPCWSTR pathname) {
     PlaySound(pathname, NULL, SND_FILENAME);
 }
 
-short int*  ProcessSound(std::string pathname) {
+void ProcessSound(std::string pathname, wav_header &header) {
 
-    wav_header header;
 
-    short int* data = header.readWAV(pathname);
+    header.readWAV(pathname);
     header.print_header();
 
-
-
-    return data;
 }
 
 void FFT() {
@@ -141,19 +141,20 @@ void FFT() {
 
 }
 
-int Draw() {
+void Draw(wav_header&  AudioFile) {
     GLFWwindow* window;
 
     /* Inicializamos la biblioteca */
     if (!glfwInit())
-        return -1;
+        //return -1;
+        return;
 
     /* Crear ventana y su contexto OpenGL*/
     window = glfwCreateWindow(640, 480, "MusicVis", NULL, NULL);
 
     if (!window) {
         glfwTerminate();
-        return -1;
+        return;
     }
 
 
@@ -169,33 +170,31 @@ int Draw() {
 	std::cout << glGetString(GL_VERSION) << std::endl;
 
 
-	{
+	
 
-		float positions[] = {
-			-0.5f, -0.5f,
-			 0.5f,  -0.5f,
-			 0.5f, 0.5f,
-			 -0.5f, 0.5f,
-		};
+        float positions[] = { AudioFile.audiodata[0], AudioFile.audiodata[1] };
 
-		unsigned int indices[] = { //Deber ser de tipo unsigned SIEMPRE
-			0,1,2,
-			2,3,0
-		};
+        //unsigned int indices[992474]; //Deber ser de tipo unsigned SIEMPRE
+			
+        unsigned int indices[] = { 1,0 };
 
 
 
 		VertexArray va;                                         /* Creamos un Vertex Array */
 
-		VertexBuffer vb(positions, 4 * 2 * sizeof(positions));  /* Creamos un Vertex Buffer */
+		                                                         /* Creamos un Vertex Buffer */
 
+
+                                                                  //Tipo de las componentes / Numero de componentes en positions
+
+
+        VertexBuffer vb(positions, 4 * 2 * sizeof(positions));
 		VertexBufferLayout layout;
-		layout.Push<float>(2); //Number of components in positions
+		layout.Push<float>(2);
 		va.AddBuffer(vb, layout);
 
-		IndexBuffer ib(indices, sizeof(indices));               /* Creamos un Index Buffer */
-
-
+        /* Creamos un Index Buffer */
+        IndexBuffer ib(indices, sizeof(indices));
 		Shader shader("res/Shader.shader");               /*Compilamos los shaders */
 		shader.Bind();
 
@@ -219,23 +218,37 @@ int Draw() {
 		float initialTime = clock() / (float)CLOCKS_PER_SEC;
 		int frames = 0;
 		double elapsed = 0;
+        int samplecount = 0;
 
 		while (!glfwWindowShouldClose(window))
 		{
 
-			float currentTime = clock() / (float)CLOCKS_PER_SEC * 12;
+			float currentTime = clock() / (float)CLOCKS_PER_SEC ;
 			elapsed = (clock() / (double)CLOCKS_PER_SEC) - initialTime;
+
+            float deltaT = currentTime - elapsed;
+
+			float framedata[]{
+                AudioFile.audiodata[samplecount  ], AudioFile.audiodata[samplecount + 1]
+			};
+
 
 			/* Render here */
 			glClear(GL_COLOR_BUFFER_BIT);
 
-			shader.Bind();
 			
+            
+            
+            shader.Bind();
 			shader.SetUniform1f("iTime", currentTime); //Uniforms can only be binded when a shader is binded lol
-			va.Bind();
-			ib.Bind();
-			renderer.Draw(va, ib, shader);
+			//shader.SetUniform4f("u_Data", audiocoords[frames], audiocoords[frames + 1],0.0f,0.0f);
+            
 
+            vb.Update(framedata, 4 * 2 * sizeof(framedata));
+            va.Bind();
+            ib.Bind();
+              
+			renderer.Draw(va,ib,shader );
 
 			/* Swap front and back buffers */
 			glfwSwapBuffers(window);
@@ -244,14 +257,22 @@ int Draw() {
 			glfwPollEvents();
 
 			//Contador de Frames y tiempo transcurrido
+            
+           
+            frames++;
+            samplecount = samplecount + 1490;
+
+            if (samplecount >= AudioFile.SampleCount)
+                break;
+            
 #if 0
-			frames++;
-			std::cout << "Frame Count: " << frames << "  Elapsed: (seconds) " << elapsed << std::endl;
+			
+			std::cout << "Frame Count: " << frames << "  Elapsed " << elapsed  << std::endl;
 #endif    
 		}
 
 
-	}
+	
 
     
 }
@@ -267,18 +288,23 @@ int main()
 
 
 
-    LPCWSTR Pathname = L"riff.wav";
+    
 
 
-    std::thread Process(ProcessSound, "riff.wav");
+    wav_header audiodata; 
+    ProcessSound("kini.wav", audiodata);
 
+    LPCWSTR Pathname = L"kini.wav";
     std::thread Playback(PlayMusic, Pathname);
 
-    std::thread Render(Draw);
-
-    Process.join();
+    
+    
+    Draw(audiodata);
+    //Playback.detach();
+    Playback.hardware_concurrency();
+    
     Playback.join();
-    Render.join();
+    //Render.join();
 
 
     return 0;
